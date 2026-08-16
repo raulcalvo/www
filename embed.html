@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Raúl Calvo — widget</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+
+<!-- Motor del widget (foto + iconos orbitando + rayo), compartido con index.html -->
+<link rel="stylesheet" href="orbit.css">
+
+<style>
+  /* Página mínima pensada para incrustarse en un <iframe> desde otra
+     web: sin marco, sin título, fondo transparente para que se integre
+     con el fondo de la página que la incruste. El widget en sí (foto +
+     iconos) vive en orbit.css/orbit.js; aquí solo se le da todo el
+     espacio disponible. */
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background: transparent;
+    overflow: hidden;
+  }
+
+  .orbit-wrap {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+</head>
+<body>
+<div class="orbit-wrap">
+  <div class="orbit">
+    <svg class="orbit-lines" aria-hidden="true">
+      <path id="trail" class="spark-trail" />
+      <path id="branch0" class="spark-trail spark-branch" />
+      <path id="branch1" class="spark-trail spark-branch" />
+    </svg>
+
+    <div class="hub">
+      <img src="images/RaulCalvoProfile.jpg" alt="Foto de perfil de Raúl Calvo">
+    </div>
+
+    <span class="spark" id="spark" aria-hidden="true"></span>
+
+    <a class="node" target="_blank" rel="noopener" href="https://www.linkedin.com/in/raulcalvotorrado/" aria-label="LinkedIn">
+      <img src="images/linkedin.png" alt="" loading="lazy">
+    </a>
+    <a class="node" target="_blank" rel="noopener" href="https://www.instagram.com/raulcalvotorrado/" aria-label="Instagram">
+      <img src="images/instagram.png" alt="" loading="lazy">
+    </a>
+    <a class="node" target="_blank" rel="noopener" href="http://www.twitter.com/raulcalvo" aria-label="Twitter">
+      <img src="images/twitter.png" alt="" loading="lazy">
+    </a>
+    <a class="node" target="_blank" rel="noopener" href="http://www.facebook.com/raulcalvotorrado" aria-label="Facebook">
+      <img src="images/facebook.png" alt="" loading="lazy">
+    </a>
+    <a class="node" target="_blank" rel="noopener" href="https://wa.me/34627010686" aria-label="WhatsApp">
+      <img src="images/whatsapp.png" alt="" loading="lazy">
+    </a>
+    <a class="node" target="_blank" rel="noopener" href="https://t.me/raulcalvo" aria-label="Telegram">
+      <img src="images/telegram.png" alt="" loading="lazy">
+    </a>
+    <a class="node" href="mailto:raulcalvo@gmail.com" aria-label="Email">
+      <img src="images/raulcalvo@gmail.com.png" alt="" loading="lazy">
+    </a>
+    <a class="node" href="tel:+34627010686" aria-label="Phone">
+      <img src="images/phone.png" alt="" loading="lazy">
+    </a>
+  </div>
+</div>
+
+<!-- Motor del widget (foto + iconos orbitando + rayo), compartido con index.html -->
+<script src="orbit.js"></script>
+</body>
+</html>

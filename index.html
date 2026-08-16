@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Raúl Calvo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Raúl Calvo — LinkedIn, Instagram, Facebook, Twitter, WhatsApp, Telegram, email, phone.">
+<meta name="theme-color" content="#eef1f7">
+<meta name="theme-color" content="#0b0d14" media="(prefers-color-scheme: dark)">
+
+<link rel="apple-touch-icon" sizes="57x57" href="/favicons/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/favicons/apple-touch-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/favicons/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/favicons/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/favicons/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/favicons/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/favicons/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/favicons/apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon-180x180.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-chrome-192x192.png" sizes="192x192">
+<link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="manifest" href="/favicons/manifest.json">
+<link rel="mask-icon" href="/favicons/safari-pinned-tab.svg" color="#d97b29">
+<meta name="msapplication-TileColor" content="#d97b29">
+<meta name="msapplication-TileImage" content="/favicons/mstile-144x144.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Motor del widget (foto + iconos orbitando + rayo), compartido con embed.html -->
+<link rel="stylesheet" href="orbit.css">
+
+<style>
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background: var(--paper);
+    background-image: radial-gradient(circle at 50% 38%, var(--accent-soft), transparent 60%);
+    color: var(--ink);
+    font-family: 'Manrope', -apple-system, 'Segoe UI', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100dvh;
+    overflow: hidden;
+    padding: clamp(10px, 2.5vh, 28px);
+  }
+
+  .mono {
+    font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+  }
+
+  /* ---------- card frame ---------- */
+  .card {
+    position: relative;
+    width: min(720px, 100%);
+    height: min(100%, 760px);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: clamp(20px, 4vw, 32px);
+    box-shadow:
+      0 1px 0 var(--line) inset,
+      0 30px 60px -30px var(--shadow),
+      0 0 0 1px var(--line),
+      0 0 90px -30px var(--accent-soft);
+    display: flex;
+    flex-direction: column;
+    padding: clamp(16px, 3.4vh, 34px) clamp(18px, 4vw, 40px);
+    gap: clamp(6px, 1.6vh, 16px);
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.6;
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    flex: none;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    flex: none;
+    animation: pulse 2.6s ease-in-out infinite;
+  }
+
+  .site-url {
+    font-size: clamp(22px, 5.2vw, 40px);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- domain switcher ---------- */
+  .domain-switch {
+    position: relative;
+    display: inline-block;
+  }
+
+  /* El color distinto ya basta para indicar que es interactivo — sin
+     icono de flecha. */
+  .domain-btn {
+    font: inherit;
+    color: var(--accent);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .domain-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    min-width: 88px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 16px 32px -16px var(--shadow), 0 0 0 1px var(--line);
+    padding: 6px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+    z-index: 20;
+  }
+
+  .domain-switch.open .domain-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .domain-option {
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .domain-option:hover,
+  .domain-option:focus-visible {
+    background: var(--accent-soft);
+    color: var(--ink);
+    outline: none;
+  }
+
+  .domain-option.is-current {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* .orbit ocupa el 100% de .orbit-wrap (definido en orbit.css); aquí
+     solo se fija cómo encaja .orbit-wrap dentro de la tarjeta. */
+  .orbit-wrap {
+    flex: 1;
+    min-height: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-dot { animation: none; }
+  }
+</style>
+</head>
+<body>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-55483070-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+<main class="card">
+  <div class="topbar">
+    <span class="status-dot" aria-hidden="true"></span>
+    <span class="site-url mono">www.raulcalvo.<span class="domain-switch" id="domainSwitch">
+      <button type="button" class="domain-btn" id="domainBtn" aria-haspopup="true" aria-expanded="false" aria-controls="domainMenu">
+        <span id="domainLabel">com</span>
+      </button>
+      <div class="domain-menu mono" id="domainMenu" role="menu">
+        <a class="domain-option" role="menuitem" data-domain="com" href="https://www.raulcalvo.com">com</a>
+        <a class="domain-option" role="menuitem" data-domain="cat" href="https://www.raulcalvo.cat">cat</a>
+        <a class="domain-option" role="menuitem" data-domain="es" href="https://www.raulcalvo.es">es</a>
+      </div>
+    </span></span>
+  </div>
+
+  <div class="orbit-wrap">
+    <div class="orbit">
+      <svg class="orbit-lines" aria-hidden="true">
+        <path id="trail" class="spark-trail" />
+        <path id="branch0" class="spark-trail spark-branch" />
+        <path id="branch1" class="spark-trail spark-branch" />
+      </svg>
+
+      <div class="hub">
+        <img src="images/RaulCalvoProfile.jpg" alt="Foto de perfil de Raúl Calvo">
+      </div>
+
+      <span class="spark" id="spark" aria-hidden="true"></span>
+
+      <a class="node" target="_blank" rel="noopener" href="https://www.linkedin.com/in/raulcalvotorrado/" aria-label="LinkedIn">
+        <img src="images/linkedin.png" alt="" loading="lazy">
+      </a>
+      <a class="node" target="_blank" rel="noopener" href="https://www.instagram.com/raulcalvotorrado/" aria-label="Instagram">
+        <img src="images/instagram.png" alt="" loading="lazy">
+      </a>
+      <a class="node" target="_blank" rel="noopener" href="http://www.twitter.com/raulcalvo" aria-label="Twitter">
+        <img src="images/twitter.png" alt="" loading="lazy">
+      </a>
+      <a class="node" target="_blank" rel="noopener" href="http://www.facebook.com/raulcalvotorrado" aria-label="Facebook">
+        <img src="images/facebook.png" alt="" loading="lazy">
+      </a>
+      <a class="node" target="_blank" rel="noopener" href="https://wa.me/34627010686" aria-label="WhatsApp">
+        <img src="images/whatsapp.png" alt="" loading="lazy">
+      </a>
+      <a class="node" target="_blank" rel="noopener" href="https://t.me/raulcalvo" aria-label="Telegram">
+        <img src="images/telegram.png" alt="" loading="lazy">
+      </a>
+      <a class="node" href="mailto:raulcalvo@gmail.com" aria-label="Email">
+        <img src="images/raulcalvo@gmail.com.png" alt="" loading="lazy">
+      </a>
+      <a class="node" href="tel:+34627010686" aria-label="Phone">
+        <img src="images/phone.png" alt="" loading="lazy">
+      </a>
+    </div>
+  </div>
+</main>
+
+<script>
+  // Desplegable de dominio: muestra el dominio real cuando es uno de los
+  // soportados; si no (desarrollo local, file://, IP...), asume .com.
+  (function () {
+    var DOMAINS = ["com", "cat", "es"];
+    var DEFAULT_DOMAIN = "com";
+    var host = window.location.hostname.toLowerCase();
+    var tld = host.substring(host.lastIndexOf(".") + 1);
+    var domain = DOMAINS.indexOf(tld) !== -1 ? tld : DEFAULT_DOMAIN;
+
+    document.getElementById("domainLabel").textContent = domain;
+    document.querySelectorAll(".domain-option").forEach(function (opt) {
+      if (opt.dataset.domain === domain) opt.classList.add("is-current");
+    });
+
+    var switchEl = document.getElementById("domainSwitch");
+    var btn = document.getElementById("domainBtn");
+
+    function closeMenu() {
+      switchEl.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+    }
+    function toggleMenu() {
+      var isOpen = switchEl.classList.toggle("open");
+      btn.setAttribute("aria-expanded", String(isOpen));
+    }
+
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+    document.addEventListener("click", function (e) {
+      if (!switchEl.contains(e.target)) closeMenu();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeMenu();
+    });
+  })();
+</script>
+
+<!-- Motor del widget (foto + iconos orbitando + rayo), compartido con embed.html -->
+<script src="orbit.js"></script>
+</body>
+</html>
