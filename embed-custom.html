@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title id="pageTitle">Widget Orbit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="icon" type="image/png" href="favicons/favicon-32x32.png" sizes="32x32">
+
+<!-- Motor visual del widget (foto + iconos orbitando + rayo) -->
+<link rel="stylesheet" href="orbit.css">
+
+<style>
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background: transparent;
+    overflow: hidden;
+  }
+
+  .orbit-wrap {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+</head>
+<body>
+<div class="orbit-wrap">
+  <div class="orbit" id="orbitContainer">
+    <svg class="orbit-lines" aria-hidden="true">
+      <path id="trail" class="spark-trail" />
+      <path id="branch0" class="spark-trail spark-branch" />
+      <path id="branch1" class="spark-trail spark-branch" />
+    </svg>
+
+    <div class="hub" id="hub">
+      <img id="hubImg" src="images/RaulCalvoProfile.jpg" alt="Foto de perfil">
+    </div>
+
+    <span class="spark" id="spark" aria-hidden="true"></span>
+
+    <!-- Los nodos (.node) se generan dinámicamente antes de inicializar orbit.js -->
+  </div>
+</div>
+
+<script>
+  (function () {
+    // Configuración por defecto (idéntica a embed.html)
+    var DEFAULT_AVATAR = "images/RaulCalvoProfile.jpg";
+    var DEFAULT_NAME = "Raúl Calvo";
+    var DEFAULT_ITEMS = [
+      { icon: "images/linkedin.png", url: "https://www.linkedin.com/in/raulcalvotorrado/", label: "LinkedIn" },
+      { icon: "images/instagram.png", url: "https://www.instagram.com/raulcalvotorrado/", label: "Instagram" },
+      { icon: "images/twitter.png", url: "http://www.twitter.com/raulcalvo", label: "Twitter" },
+      { icon: "images/facebook.png", url: "http://www.facebook.com/raulcalvotorrado", label: "Facebook" },
+      { icon: "images/whatsapp.png", url: "https://wa.me/34627010686", label: "WhatsApp" },
+      { icon: "images/telegram.png", url: "https://t.me/raulcalvo", label: "Telegram" },
+      { icon: "images/email.png", url: "mailto:raulcalvo@gmail.com", label: "Email" },
+      { icon: "images/phone.png", url: "tel:+34627010686", label: "Phone" }
+    ];
+
+    function safeUrl(url) {
+      if (!url || typeof url !== "string") return "#";
+      var trimmed = url.trim();
+      // Permitir http, https, mailto, tel o rutas relativas
+      if (/^(https?:\/\/|mailto:|tel:|\/|\.\/|[a-zA-Z0-9_\-\/]+\.[a-zA-Z0-9]+)/i.test(trimmed)) {
+        return trimmed;
+      }
+      return "#";
+    }
+
+    function safeImgUrl(url) {
+      if (!url || typeof url !== "string") return "";
+      var trimmed = url.trim();
+      if (/^(https?:\/\/|data:image\/|\/|\.\/|[a-zA-Z0-9_\-\/]+\.[a-zA-Z0-9]+)/i.test(trimmed)) {
+        return trimmed;
+      }
+      return "";
+    }
+
+    function parseConfig() {
+      var params = new URLSearchParams(window.location.search);
+      var hash = window.location.hash.replace(/^#/, "");
+      var hashParams = new URLSearchParams(hash);
+
+      var avatar = params.get("avatar") || params.get("profile") || params.get("img") || hashParams.get("avatar") || "";
+      var name = params.get("name") || params.get("alt") || hashParams.get("name") || "";
+      var rawConfig = params.get("config") || hashParams.get("config") || "";
+      var rawData = params.get("data") || hashParams.get("data") || "";
+
+      var items = [];
+
+      // 1. Intentar parsear Base64 (#data=... o ?data=...)
+      if (rawData) {
+        try {
+          var decodedStr = atob(decodeURIComponent(rawData));
+          var parsedData = JSON.parse(decodedStr);
+          if (parsedData) {
+            if (parsedData.avatar && !avatar) avatar = parsedData.avatar;
+            if (parsedData.name && !name) name = parsedData.name;
+            if (Array.isArray(parsedData.items)) items = parsedData.items;
+          }
+        } catch (e) {
+          console.warn("No se pudo decodificar el parámetro data base64:", e);
+        }
+      }
+
+      // 2. Intentar parsear JSON en config (?config=... o #config=...)
+      if (rawConfig && items.length === 0) {
+        try {
+          var parsedConfig = JSON.parse(rawConfig);
+          if (parsedConfig) {
+            if (parsedConfig.avatar && !avatar) avatar = parsedConfig.avatar;
+            if (parsedConfig.name && !name) name = parsedConfig.name;
+            if (Array.isArray(parsedConfig.items)) items = parsedConfig.items;
+          }
+        } catch (e) {
+          console.warn("No se pudo parsear el parámetro config JSON:", e);
+        }
+      }
+
+      // 3. Intentar parsear parámetros repetidos 'item' o 'node' (ej: ?item=icon|url|label)
+      if (items.length === 0) {
+        var itemParams = params.getAll("item").concat(params.getAll("node")).concat(hashParams.getAll("item"));
+        if (itemParams.length > 0) {
+          items = itemParams.map(function (str) {
+            var parts = str.split("|");
+            return {
+              icon: parts[0] || "",
+              url: parts[1] || "",
+              label: parts[2] || "",
+              target: parts[3] || ""
+            };
+          }).filter(function (it) { return it.icon || it.url; });
+        }
+      }
+
+      // 4. Intentar parsear parámetros indexados (icon1, url1, label1, icon2...)
+      if (items.length === 0) {
+        var idx = 1;
+        while (params.has("icon" + idx) || params.has("url" + idx) || hashParams.has("icon" + idx)) {
+          var icon = params.get("icon" + idx) || hashParams.get("icon" + idx) || "";
+          var url = params.get("url" + idx) || hashParams.get("url" + idx) || "";
+          var label = params.get("label" + idx) || hashParams.get("label" + idx) || ("Enlace " + idx);
+          if (icon || url) {
+            items.push({ icon: icon, url: url, label: label });
+          }
+          idx++;
+        }
+      }
+
+      // Fallback a los valores por defecto si no se especificaron
+      if (!avatar) avatar = DEFAULT_AVATAR;
+      if (!name) name = DEFAULT_NAME;
+      if (items.length === 0) items = DEFAULT_ITEMS;
+
+      return {
+        avatar: avatar,
+        name: name,
+        items: items
+      };
+    }
+
+    var config = parseConfig();
+
+    // Actualizar título y foto de perfil central
+    var pageTitle = document.getElementById("pageTitle");
+    if (pageTitle && config.name) {
+      pageTitle.textContent = config.name + " — widget";
+    }
+
+    var hubImg = document.getElementById("hubImg");
+    if (hubImg) {
+      hubImg.src = safeImgUrl(config.avatar) || DEFAULT_AVATAR;
+      hubImg.alt = config.name ? "Foto de perfil de " + config.name : "Foto de perfil";
+    }
+
+    // Inyectar nodos orbitantes en el contenedor
+    var orbit = document.getElementById("orbitContainer");
+    if (orbit) {
+      config.items.forEach(function (item) {
+        var a = document.createElement("a");
+        a.className = "node";
+        var href = safeUrl(item.url);
+        a.href = href;
+
+        if (item.label) {
+          a.setAttribute("aria-label", item.label);
+        }
+
+        // Determinar target
+        var isExternal = /^https?:\/\//i.test(href);
+        var isSpecial = /^(mailto:|tel:)/i.test(href);
+        if (item.target) {
+          a.target = item.target;
+        } else if (isExternal) {
+          a.target = "_blank";
+        }
+
+        if (a.target === "_blank") {
+          a.rel = "noopener";
+        }
+
+        var img = document.createElement("img");
+        img.src = safeImgUrl(item.icon);
+        img.alt = item.label || "";
+        img.loading = "lazy";
+
+        a.appendChild(img);
+        orbit.appendChild(a);
+      });
+    }
+  })();
+</script>
+
+<!-- Motor del widget (foto + iconos orbitando + rayo) -->
+<script src="orbit.js"></script>
+</body>
+</html>

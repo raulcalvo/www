@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Generador de Widget Orbit — Raúl Calvo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Configurador interactivo para personalizar tu widget orbit con foto de perfil y enlaces sociales.">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="icon" type="image/png" href="favicons/favicon-32x32.png" sizes="32x32">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="orbit.css">
+
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Manrope', -apple-system, 'Segoe UI', sans-serif;
+    padding: clamp(16px, 3vw, 40px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .builder-container {
+    width: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  @media (max-width: 900px) {
+    .builder-container {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  header {
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    margin: 4px 0 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  .card-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 14px 34px -16px var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  input[type="text"], input[type="url"] {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input[type="text"]:focus, input[type="url"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 440px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .item-row {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+
+  .item-row-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .item-icon-preview {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .item-icon-preview img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+  }
+
+  .item-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .btn {
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    transition: background 0.2s, border-color 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .btn:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .btn-accent {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .btn-accent:hover {
+    background: var(--accent-bright);
+    color: #fff;
+  }
+
+  .btn-danger {
+    color: #dc3545;
+    background: transparent;
+    border-color: transparent;
+    padding: 4px 8px;
+  }
+
+  .btn-danger:hover {
+    background: rgba(220, 53, 69, 0.1);
+    border-color: rgba(220, 53, 69, 0.3);
+  }
+
+  .presets-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .preset-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 20px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    color: var(--ink-soft);
+    transition: all 0.2s;
+  }
+
+  .preset-btn:hover {
+    color: var(--ink);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .preview-wrapper {
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .preview-frame-container {
+    width: 100%;
+    height: 480px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+  }
+
+  .preview-frame-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: transparent;
+  }
+
+  .code-output {
+    position: relative;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    word-break: break-all;
+    user-select: all;
+  }
+
+  .copy-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+
+  .copied-toast {
+    display: none;
+    color: #28a745;
+    font-weight: 600;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Personalizador de Widget Orbit</h1>
+    <p class="subtitle">Configura tu foto central, añade cualquier enlace o red social y obtén tu embed listo para incrustar.</p>
+  </div>
+  <a href="embed-custom.html" target="_blank" class="btn">Abrir Embed Dinámico &nearr;</a>
+</header>
+
+<main class="builder-container">
+  <!-- Columna izquierda: Configuración -->
+  <section class="card-panel">
+    <div class="section-title">
+      <span>1. Foto de Perfil Central</span>
+    </div>
+    
+    <div class="form-group">
+      <label for="inputAvatar">URL de la imagen de perfil</label>
+      <input type="text" id="inputAvatar" value="images/RaulCalvoProfile.jpg" placeholder="https://ejemplo.com/tu-foto.jpg">
+    </div>
+
+    <div class="form-group">
+      <label for="inputName">Nombre / Texto alternativo</label>
+      <input type="text" id="inputName" value="Raúl Calvo" placeholder="Tu Nombre">
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid var(--line); margin: 6px 0;">
+
+    <div class="section-title">
+      <span>2. Elementos Orbitantes (<span id="itemsCount">8</span>)</span>
+      <button type="button" class="btn btn-accent" id="btnAddItem">+ Añadir enlace</button>
+    </div>
+
+    <div>
+      <label>Añadir rápido desde plantilla:</label>
+      <div class="presets-bar">
+        <button type="button" class="preset-btn" data-preset="linkedin">LinkedIn</button>
+        <button type="button" class="preset-btn" data-preset="github">GitHub</button>
+        <button type="button" class="preset-btn" data-preset="instagram">Instagram</button>
+        <button type="button" class="preset-btn" data-preset="twitter">X / Twitter</button>
+        <button type="button" class="preset-btn" data-preset="whatsapp">WhatsApp</button>
+        <button type="button" class="preset-btn" data-preset="telegram">Telegram</button>
+        <button type="button" class="preset-btn" data-preset="email">Email</button>
+        <button type="button" class="preset-btn" data-preset="phone">Teléfono</button>
+      </div>
+    </div>
+
+    <div class="items-list" id="itemsList">
+      <!-- Generado dinámicamente -->
+    </div>
+  </section>
+
+  <!-- Columna derecha: Previsualización y Código -->
+  <section class="preview-wrapper">
+    <div class="card-panel">
+      <div class="section-title">
+        <span>Previsualización en Vivo</span>
+        <button type="button" class="btn" id="btnRefreshPreview">&#8635; Recargar</button>
+      </div>
+
+      <div class="preview-frame-container">
+        <iframe id="previewIframe" src="embed-custom.html" title="Widget Preview"></iframe>
+      </div>
+
+      <div class="section-title" style="margin-top: 10px;">
+        <span>Código para tu Web (iFrame)</span>
+        <button type="button" class="btn btn-accent" id="btnCopyIframe">Copiar IFrame</button>
+      </div>
+      <div class="code-output mono" id="iframeCodeOutput"></div>
+
+      <div class="section-title" style="margin-top: 10px;">
+        <span>URL Directa</span>
+        <button type="button" class="btn" id="btnCopyUrl">Copiar URL</button>
+      </div>
+      <div class="code-output mono" id="urlCodeOutput"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+  (function () {
+    var PRESET_DATA = {
+      linkedin: { label: "LinkedIn", icon: "images/linkedin.png", url: "https://www.linkedin.com/in/" },
+      github: { label: "GitHub", icon: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg", url: "https://github.com/" },
+      instagram: { label: "Instagram", icon: "images/instagram.png", url: "https://www.instagram.com/" },
+      twitter: { label: "Twitter", icon: "images/twitter.png", url: "https://twitter.com/" },
+      whatsapp: { label: "WhatsApp", icon: "images/whatsapp.png", url: "https://wa.me/34627010686" },
+      telegram: { label: "Telegram", icon: "images/telegram.png", url: "https://t.me/raulcalvo" },
+      email: { label: "Email", icon: "images/email.png", url: "mailto:raulcalvo@gmail.com" },
+      phone: { label: "Phone", icon: "images/phone.png", url: "tel:+34627010686" }
+    };
+
+    var items = [
+      { icon: "images/linkedin.png", url: "https://www.linkedin.com/in/raulcalvotorrado/", label: "LinkedIn" },
+      { icon: "images/instagram.png", url: "https://www.instagram.com/raulcalvotorrado/", label: "Instagram" },
+      { icon: "images/twitter.png", url: "http://www.twitter.com/raulcalvo", label: "Twitter" },
+      { icon: "images/facebook.png", url: "http://www.facebook.com/raulcalvotorrado", label: "Facebook" },
+      { icon: "images/whatsapp.png", url: "https://wa.me/34627010686", label: "WhatsApp" },
+      { icon: "images/telegram.png", url: "https://t.me/raulcalvo", label: "Telegram" },
+      { icon: "images/email.png", url: "mailto:raulcalvo@gmail.com", label: "Email" },
+      { icon: "images/phone.png", url: "tel:+34627010686", label: "Phone" }
+    ];
+
+    var inputAvatar = document.getElementById("inputAvatar");
+    var inputName = document.getElementById("inputName");
+    var itemsList = document.getElementById("itemsList");
+    var itemsCount = document.getElementById("itemsCount");
+    var previewIframe = document.getElementById("previewIframe");
+    var iframeCodeOutput = document.getElementById("iframeCodeOutput");
+    var urlCodeOutput = document.getElementById("urlCodeOutput");
+
+    function renderList() {
+      itemsList.innerHTML = "";
+      itemsCount.textContent = items.length;
+
+      items.forEach(function (item, index) {
+        var row = document.createElement("div");
+        row.className = "item-row";
+
+        row.innerHTML = `
+          <div class="item-row-header">
+            <div class="item-icon-preview">
+              <img src="${item.icon || 'images/linkedin.png'}" onerror="this.style.opacity=0.3" alt="">
+            </div>
+            <input type="text" class="input-label" placeholder="Nombre / Red" value="${item.label || ''}" style="flex: 1; padding: 6px 10px; font-size: 13px;">
+            <button type="button" class="btn btn-danger btn-delete" title="Eliminar">&times;</button>
+          </div>
+          <div class="item-inputs">
+            <input type="text" class="input-icon" placeholder="URL Icono (png/svg)" value="${item.icon || ''}" style="padding: 6px 10px; font-size: 12px;">
+            <input type="text" class="input-url" placeholder="URL Destino (https://...)" value="${item.url || ''}" style="padding: 6px 10px; font-size: 12px;">
+          </div>
+        `;
+
+        // Eventos
+        var inputLabel = row.querySelector(".input-label");
+        var inputIcon = row.querySelector(".input-icon");
+        var inputUrl = row.querySelector(".input-url");
+        var iconImg = row.querySelector(".item-icon-preview img");
+
+        inputLabel.addEventListener("input", function () {
+          item.label = inputLabel.value;
+          updatePreview();
+        });
+
+        inputIcon.addEventListener("input", function () {
+          item.icon = inputIcon.value;
+          iconImg.src = inputIcon.value;
+          updatePreview();
+        });
+
+        inputUrl.addEventListener("input", function () {
+          item.url = inputUrl.value;
+          updatePreview();
+        });
+
+        row.querySelector(".btn-delete").addEventListener("click", function () {
+          items.splice(index, 1);
+          renderList();
+          updatePreview();
+        });
+
+        itemsList.appendChild(row);
+      });
+    }
+
+    var debounceTimer = null;
+    function updatePreview() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(function () {
+        var avatar = inputAvatar.value.trim();
+        var name = inputName.value.trim();
+
+        // Construir URL con parámetros
+        var isDefault = (avatar === "images/RaulCalvoProfile.jpg" && name === "Raúl Calvo" && items.length === 8);
+        
+        var queryParams = new URLSearchParams();
+        if (avatar && avatar !== "images/RaulCalvoProfile.jpg") queryParams.set("avatar", avatar);
+        if (name && name !== "Raúl Calvo") queryParams.set("name", name);
+
+        items.forEach(function (it) {
+          if (it.icon || it.url) {
+            queryParams.append("item", (it.icon || "") + "|" + (it.url || "") + "|" + (it.label || ""));
+          }
+        });
+
+        var queryString = queryParams.toString();
+        var targetUrl = queryString ? "embed-custom.html?" + queryString : "embed-custom.html";
+
+        previewIframe.src = targetUrl;
+        
+        var fullAbsoluteUrl = window.location.origin + window.location.pathname.replace(/builder\.html.*$/i, "") + targetUrl;
+        urlCodeOutput.textContent = fullAbsoluteUrl;
+
+        var iframeSnippet = `<iframe src="${fullAbsoluteUrl}" width="500" height="500" frameborder="0" style="border:0; width:100%; height:100%; max-width:600px; aspect-ratio:1/1;" allowtransparency="true"></iframe>`;
+        iframeCodeOutput.textContent = iframeSnippet;
+      }, 250);
+    }
+
+    // Botón añadir
+    document.getElementById("btnAddItem").addEventListener("click", function () {
+      items.push({ icon: "images/linkedin.png", url: "https://", label: "Nuevo Enlace" });
+      renderList();
+      updatePreview();
+    });
+
+    // Presets
+    document.querySelectorAll(".preset-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var p = PRESET_DATA[btn.dataset.preset];
+        if (p) {
+          items.push({ icon: p.icon, url: p.url, label: p.label });
+          renderList();
+          updatePreview();
+        }
+      });
+    });
+
+    inputAvatar.addEventListener("input", updatePreview);
+    inputName.addEventListener("input", updatePreview);
+
+    document.getElementById("btnRefreshPreview").addEventListener("click", function () {
+      previewIframe.src = previewIframe.src;
+    });
+
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(function () {
+        var originalText = btn.textContent;
+        btn.textContent = "¡Copiado!";
+        setTimeout(function () { btn.textContent = originalText; }, 1800);
+      });
+    }
+
+    document.getElementById("btnCopyIframe").addEventListener("click", function () {
+      copyText(iframeCodeOutput.textContent, this);
+    });
+
+    document.getElementById("btnCopyUrl").addEventListener("click", function () {
+      copyText(urlCodeOutput.textContent, this);
+    });
+
+    renderList();
+    updatePreview();
+  })();
+</script>
+</body>
+</html>

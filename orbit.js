@@ -41,10 +41,13 @@
 
   // Un icono por elipse propia: velocidad, sentido, tamaño e
   // inclinación aleatorios (fijados una vez al cargar la página).
-  var icons = Array.prototype.slice.call(document.querySelectorAll(".node")).map(function (el, i) {
+  var nodeEls = Array.prototype.slice.call(document.querySelectorAll(".node"));
+  var totalNodes = nodeEls.length || 1;
+  var icons = nodeEls.map(function (el, i) {
+    var initialTheta = totalNodes === 8 ? SQUARE[i] : ((360 / totalNodes) * i - 90);
     return {
       el: el,
-      theta: SQUARE[i % SQUARE.length],    // ángulo actual (grados)
+      theta: initialTheta,                 // ángulo actual (grados)
       dir: (i % 2 === 0) ? 1 : -1,         // sentidos alternos: los vecinos tienden a separarse, no a perseguirse
       omega: rand(OMEGA_MIN, OMEGA_MAX),   // velocidad angular propia
       sizeVar: rand(0.82, 1.18),           // tamaño de elipse propio
